@@ -1,0 +1,81 @@
+
+#Traefik Global Configuration
+debug = true
+checkNewVersion = true
+# logLevel = "ERROR"
+logLevel = "DEBUG"
+ 
+#Define the EntryPoint for HTTP and HTTPS
+defaultEntryPoints = ["https","http"]
+ 
+#Define the HTTP port 80 and
+#HTTPS port 443 EntryPoint
+#Enable automatically redirect HTTP to HTTPS
+[entryPoints]
+  [entryPoints.webadmin]
+    address = ":8081"
+    [entryPoints.webadmin.tls]
+      [[entryPoints.webadmin.tls.certificates]]
+        certFile = "docker.localhost+3.pem"
+        keyFile = "docker.localhost+3-key.pem"
+  [entryPoints.bar]
+    address = ":8082"
+  [entryPoints.http]
+    address = ":80"
+    #[entryPoints.http.redirect]
+    #  regex = "^http://www\\.(.+)"
+    #  replacement = "https://$1"
+    #  permanent = true
+  [entryPoints.https]
+    address = ":443"
+    [entryPoints.https.redirect]
+      regex = "^https://www\\.(.+)"
+      replacement = "https://$1"
+      permanent = true
+    [entryPoints.https.tls]
+      [[entryPoints.https.tls.certificates]]
+        certFile = "docker.localhost+3.pem"
+        keyFile = "docker.localhost+3-key.pem"
+ 
+[[tls.certificates]]
+  certFile = "docker.localhost+3.pem"
+  keyFile = "docker.localhost+3-key.pem"
+[tls.stores]
+  [tls.stores.default]
+    [tls.stores.default.defaultCertificate]
+      certFile = "path/to/cert.crt"
+      keyFile  = "path/to/cert.key"
+
+#Enable retry sending a request if the network error
+[retry]
+
+[ping]
+  entryPoint = "bar"
+
+#Define Docker Backend Configuration
+[docker]
+  endpoint = "unix:///var/run/docker.sock"
+  domain = "docker.localhost"
+  watch = true
+  exposedByDefault = false
+  network = "web"
+  swarmMode = false
+ 
+# Enable API and dashboard
+[api]
+  #entryPoint = "traefik"
+  entryPoint = "webadmin"
+  dashboard = true
+  debug = true
+
+#Letsencrypt Registration
+#Define the Letsencrypt ACME HTTP challenge
+#[acme]
+#  email = "alex@tech-success.ru"
+#  storage = "acme.json"
+#  entryPoint = "https"
+#  onHostRule = true
+#[acme.httpChallenge]
+#  entryPoint = "http"
+
+

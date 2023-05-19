@@ -1,0 +1,19 @@
+version: ‘3’
+services:
+ traefik:
+   image: traefik:latest
+   command: —docker —docker.domain=ВАШ_ДОМЕН
+   ports:
+     — 80:80
+     — 443:443
+   networks:
+     — traefik-proxy
+   volumes:
+     — /var/run/docker.sock:/var/run/docker.sock
+     — ./traefik/traefik.toml:/traefik.toml
+     — ./traefik/acme.json:/acme.json
+   labels:
+     — traefik.frontend.rule=Host:docker.
+     — traefik.port=8080
+   container_name: traefik
+   restart: always

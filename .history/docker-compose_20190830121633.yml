@@ -1,0 +1,27 @@
+version: '3'
+services:
+ traefik:
+   image: traefik:1.7-alpine
+   container_name: traefik_proxy2
+   restart: always
+   command: --docker --docker.watch
+   ports:
+     - 80:80
+     - 443:443
+     - 8081:8081
+     - 8082:8082
+   networks:
+     - web
+   volumes:
+     - /var/run/docker.sock:/var/run/docker.sock
+     - ./traefik.toml:/etc/traefik/traefik.toml
+     - ./acme.json:/acme.json
+     - ./:/cert
+   labels:
+     - traefik.frontend.rule=Host:docker.localhost
+     - traefik.port=8081
+   
+
+networks: 
+  web:
+    external: true
